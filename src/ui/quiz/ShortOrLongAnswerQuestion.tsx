@@ -16,6 +16,7 @@ const ShortOrLongAnswerQuestion = ({ app, question, settings }: ShortOrLongAnswe
 	const component = useMemo<Component>(() => new Component(), []);
 	const questionRef = useRef<HTMLDivElement>(null);
 	const answerRef = useRef<HTMLButtonElement>(null);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		question.question.split("\\n").forEach(questionFragment => {
@@ -23,11 +24,13 @@ const ShortOrLongAnswerQuestion = ({ app, question, settings }: ShortOrLongAnswe
 				MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
 			}
 		});
+
 	}, [app, question, component]);
 
 	useEffect(() => {
-		if (answerRef.current && status === "submitted") {
-			MarkdownRenderer.render(app, question.answer, answerRef.current, "", component);
+		if (sourceRef.current && status === "submitted") {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
 		}
 	}, [app, question, component, status]);
 
@@ -55,10 +58,20 @@ const ShortOrLongAnswerQuestion = ({ app, question, settings }: ShortOrLongAnswe
 		}
 	};
 
+	const getClass = (status: string) => {
+		if(status === "submitted"){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
+		}
+	};
+
 	return (
 		<div className="question-container-qg">
 			<div className="question-qg" ref={questionRef} />
-			{status === "submitted" && <button className="answer-qg" ref={answerRef} />}
+			{/* {status === "submitted" && <button className="answer-qg" ref={answerRef} />} */}
+			<div className={getClass(status)} ref={sourceRef} />
 			<div className={status === "submitted" ? "input-container-qg" : "input-container-qg limit-height-qg"}>
 				<AnswerInput onSubmit={handleSubmit} clearInputOnSubmit={false} disabled={status !== "answering"} />
 				<div className="instruction-footnote-qg">

@@ -112,29 +112,35 @@ export default class SelectorModal extends Modal {
 					new Notice("Error: Generation returned nothing");
 					return;
 				}
-
-				const quiz: Quiz = JSON.parse(generatedQuestions.replace(/\\+/g, "\\\\"));
+				
+				// const quiz: Quiz = JSON.parse(generatedQuestions.replace(/\\+/g, "\\\\"));
+				const quiz: Quiz = JSON.parse(generatedQuestions);
 				const questions: Question[] = [];
-				quiz.questions.forEach(question => {
-					if (isTrueFalse(question)) {
-						questions.push(question);
-					} else if (isMultipleChoice(question)) {
-						questions.push(question);
-					} else if (isSelectAllThatApply(question)) {
-						questions.push(question);
-					} else if (isFillInTheBlank(question)) {
-						const normalizeBlanks = (str: string): string => {
-							return this.settings.provider !== Provider.COHERE ? str : str.replace(/_{2,}|\$_{2,}\$/g, "`____`");
-						};
-						questions.push({ question: normalizeBlanks(question.question), answer: question.answer });
-					} else if (isMatching(question)) {
-						questions.push(question);
-					} else if (isShortOrLongAnswer(question)) {
-						questions.push(question);
-					} else {
-						new Notice("A question was generated incorrectly");
+				for (const question of quiz.questions) {
+					try {
+						if (isTrueFalse(question)) {
+							questions.push(question);
+						  } else if (isMultipleChoice(question)) {
+							questions.push(question);
+						  } else if (isSelectAllThatApply(question)) {
+							questions.push(question);
+						  } else if (isFillInTheBlank(question)) {
+							const normalizeBlanks = (str: string): string => {
+							  return this.settings.provider !== Provider.COHERE ? str : str.replace(/_{2,}|\$_{2,}\$/g, "`____`");
+							};
+							questions.push({ question: normalizeBlanks(question.question), answer: question.answer, source: question.source});
+						  } else if (isMatching(question)) {
+							questions.push(question);
+						  } else if (isShortOrLongAnswer(question)) {
+							questions.push(question);
+						  } else {
+							new Notice("A question was generated incorrectly");
+						  }
+					} catch (error) {
+						new Notice((error as Error).message, 0); // 单个问题生成失败时，打印不终止
+						continue;
 					}
-				});
+				}
 
 				this.quiz = new QuizModalLogic(this.app, this.settings, questions, [...this.selectedNoteFiles.values()].flat());
 				await this.quiz.renderQuiz();

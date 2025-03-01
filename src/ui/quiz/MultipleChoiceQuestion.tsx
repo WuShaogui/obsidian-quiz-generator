@@ -11,23 +11,32 @@ const MultipleChoiceQuestion = ({ app, question }: MultipleChoiceQuestionProps) 
 	const [userAnswer, setUserAnswer] = useState<number | null>(null);
 	const questionRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const [showSource, setShowSource] = useState(false);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const component = new Component();
 
 		question.question.split("\\n").forEach(questionFragment => {
-			if (questionRef.current) {
+			if (questionRef.current && userAnswer === null) {
 				MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
 			}
 		});
 
 		buttonRefs.current = buttonRefs.current.slice(0, question.options.length);
 		buttonRefs.current.forEach((button, index) => {
-			if (button) {
+			if (button && userAnswer === null) {
 				MarkdownRenderer.render(app, question.options[index], button, "", component);
 			}
 		});
-	}, [app, question]);
+
+
+		// 显示答案
+		if (showSource && sourceRef.current) {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
+		}
+	}, [app, question,showSource]);
 
 	const getButtonClass = (buttonAnswer: number) => {
 		if (userAnswer === null) return "multiple-choice-button-qg";
@@ -39,6 +48,15 @@ const MultipleChoiceQuestion = ({ app, question }: MultipleChoiceQuestionProps) 
 		return "multiple-choice-button-qg";
 	};
 
+	const getClass = () => {
+		if(userAnswer != null){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
+		}
+	};
+
 	return (
 		<div className="question-container-qg">
 			<div className="question-qg" ref={questionRef} />
@@ -48,11 +66,15 @@ const MultipleChoiceQuestion = ({ app, question }: MultipleChoiceQuestionProps) 
 						key={index}
 						ref={(el) => buttonRefs.current[index] = el}
 						className={getButtonClass(index)}
-						onClick={() => setUserAnswer(index)}
+						onClick={() => {
+							setUserAnswer(index);
+							setShowSource(true);
+						}}
 						disabled={userAnswer !== null}
 					/>
 				))}
 			</div>
+			<div className={getClass()} ref={sourceRef} />
 		</div>
 	);
 };

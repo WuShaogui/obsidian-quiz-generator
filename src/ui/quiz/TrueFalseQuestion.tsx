@@ -10,16 +10,28 @@ interface TrueFalseQuestionProps {
 const TrueFalseQuestion = ({ app, question }: TrueFalseQuestionProps) => {
 	const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
 	const questionRef = useRef<HTMLDivElement>(null);
+	const [showSource, setShowSource] = useState(false);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const component = new Component();
-
 		question.question.split("\\n").forEach(questionFragment => {
-			if (questionRef.current) {
+			if (!showSource && questionRef.current) {
 				MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
 			}
 		});
-	}, [app, question]);
+		
+		if (showSource && sourceRef.current) {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
+		}
+
+	}, [app, question,showSource]);
+
+	const handleAnswer = (answer: boolean) => {
+		setUserAnswer(answer);
+		setShowSource(true);
+	};
 
 	const getButtonClass = (buttonAnswer: boolean) => {
 		if (userAnswer === null) return "true-false-button-qg";
@@ -31,25 +43,35 @@ const TrueFalseQuestion = ({ app, question }: TrueFalseQuestionProps) => {
 		return "true-false-button-qg";
 	};
 
+	const getClass = () => {
+		if(userAnswer != null){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
+		}
+	};
+
 	return (
 		<div className="question-container-qg">
 			<div className="question-qg" ref={questionRef} />
 			<div className="true-false-container-qg">
 				<button
 					className={getButtonClass(true)}
-					onClick={() => setUserAnswer(true)}
+					onClick={() => {handleAnswer(true);}}
 					disabled={userAnswer !== null}
 				>
 					True
 				</button>
 				<button
 					className={getButtonClass(false)}
-					onClick={() => setUserAnswer(false)}
+					onClick={() => handleAnswer(false)}
 					disabled={userAnswer !== null}
 				>
 					False
 				</button>
 			</div>
+			<div className={getClass()} ref={sourceRef} />
 		</div>
 	);
 };

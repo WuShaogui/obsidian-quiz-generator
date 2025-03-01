@@ -11,6 +11,8 @@ interface FillInTheBlankQuestionProps {
 const FillInTheBlankQuestion = ({ app, question }: FillInTheBlankQuestionProps) => {
 	const [filledBlanks, setFilledBlanks] = useState<string[]>(Array(question.answer.length).fill(""));
 	const questionRef = useRef<HTMLDivElement>(null);
+	const [showSource, setShowSource] = useState(false);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const generateQuestion = () => {
@@ -24,17 +26,22 @@ const FillInTheBlankQuestion = ({ app, question }: FillInTheBlankQuestionProps) 
 			});
 		};
 
+		const component = new Component();
 		if (questionRef.current) {
 			questionRef.current.empty();
-			const component = new Component();
-
 			generateQuestion().split("\\n").forEach(questionFragment => {
 				if (questionRef.current) {
 					MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
 				}
 			});
 		}
-	}, [app, question, filledBlanks]);
+
+		// 显示答案
+		if (showSource && sourceRef.current) {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
+		}
+	}, [app, question, filledBlanks,showSource]);
 
 	const handleSubmit = (input: string) => {
 		const normalizedInput = input.toLowerCase().trim();
@@ -51,7 +58,18 @@ const FillInTheBlankQuestion = ({ app, question }: FillInTheBlankQuestionProps) 
 		} else if (normalizedInput === "skip") {
 			setFilledBlanks(question.answer);
 		} else {
-			new Notice("Incorrect");
+			new Notice("Incorrect，True result: "+question.answer);
+		}
+
+		setShowSource(true);
+	};
+
+	const getClass = () => {
+		if(showSource){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
 		}
 	};
 
@@ -64,6 +82,7 @@ const FillInTheBlankQuestion = ({ app, question }: FillInTheBlankQuestionProps) 
 					Press enter to submit your answer to a blank. Enter "skip" to reveal all answers.
 				</div>
 			</div>
+			<div className={getClass()} ref={sourceRef} />
 		</div>
 	);
 };

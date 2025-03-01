@@ -8,11 +8,14 @@ interface MatchingQuestionProps {
 	question: Matching;
 }
 
+
+
 const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 	const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
 	const [selectedRight, setSelectedRight] = useState<number | null>(null);
 	const [selectedPairs, setSelectedPairs] = useState<{ leftIndex: number, rightIndex: number }[]>([]);
 	const [status, setStatus] = useState<"answering" | "submitted" | "reviewing">("answering");
+	const [showSource, setShowSource] = useState(false);
 
 	const leftOptions = useMemo<{ value: string, index: number }[]>(() =>
 			shuffleArray(question.answer.map((pair, index) => ({ value: pair.leftOption, index }))),
@@ -36,12 +39,13 @@ const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 
 	const questionRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const component = new Component();
 
 		question.question.split("\\n").forEach(questionFragment => {
-			if (questionRef.current) {
+			if (questionRef.current && status === "answering") {
 				MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
 			}
 		});
@@ -57,7 +61,13 @@ const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 				MarkdownRenderer.render(app, rightOptions[index].value, rightButton, "", component);
 			}
 		});
-	}, [app, question, leftOptions, rightOptions]);
+
+		// 显示答案
+		if (showSource && sourceRef.current) {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
+		}
+	}, [app, question, leftOptions, rightOptions,showSource]);
 
 	const handleLeftClick = (leftIndex: number) => {
 		if (selectedLeft === leftIndex) {
@@ -153,6 +163,16 @@ const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 		return "matching-button-qg";
 	};
 
+
+	const getClass = () => {
+		if(status === "submitted" || status === "reviewing"){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
+		}
+	};
+
 	return (
 		<div className="question-container-qg">
 			<div className="question-qg" ref={questionRef} />
@@ -204,7 +224,10 @@ const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 			</div>
 			<button
 				className="submit-answer-qg"
-				onClick={() => setStatus(status === "answering" ? "submitted" : "reviewing")}
+				onClick={() => {
+					setStatus(status === "answering" ? "submitted" : "reviewing");
+					setShowSource(true);
+				}}
 				disabled={
 					selectedPairs.length !== question.answer.length ||
 					status === "reviewing" ||
@@ -214,6 +237,7 @@ const MatchingQuestion = ({ app, question }: MatchingQuestionProps) => {
 			>
 				{status === "answering" ? "Submit" : "Reveal answer"}
 			</button>
+			<div className={getClass()} ref={sourceRef} />
 		</div>
 	);
 };

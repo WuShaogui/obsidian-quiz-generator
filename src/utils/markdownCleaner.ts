@@ -3,11 +3,39 @@ export const cleanUpNoteContents = (noteContents: string, hasFrontMatter: boolea
 	if (hasFrontMatter) {
 		cleanedContents = removeFrontMatter(cleanedContents);
 	}
+	cleanedContents= removeHexoHead(cleanedContents); // 去掉hexo博客文章特有字符
+	// cleanedContents = cleanUpLinks(cleanedContents);
+	// cleanedContents = removeMarkdownHeadings(cleanedContents); // 标题不去掉
+	// cleanedContents = removeMarkdownFormatting(cleanedContents);
+	// return cleanUpWhiteSpace(cleanedContents);
+	return cleanedContents;
+};
+
+export const cleanUpNoteContents2 = (noteContents: string, hasFrontMatter: boolean): string => {
+	let cleanedContents = noteContents;
+	if (hasFrontMatter) {
+		cleanedContents = removeFrontMatter(cleanedContents);
+	}
+	cleanedContents= removeHexoHead(cleanedContents); // 去掉hexo博客文章特有字符
 	cleanedContents = cleanUpLinks(cleanedContents);
-	cleanedContents = removeMarkdownHeadings(cleanedContents);
+	cleanedContents = removeMarkdownHeadings(cleanedContents); // 标题不去掉
 	cleanedContents = removeMarkdownFormatting(cleanedContents);
 	return cleanUpWhiteSpace(cleanedContents);
 };
+
+
+const removeHexoHead = (input: string): string => {
+	const moreTag = "<!-- more -->";
+	const moreIndex = input.indexOf(moreTag);
+
+	if (moreIndex === -1) {
+		return input; // 如果没找到标记，返回原文本
+	  }
+	  
+	  // 返回标记之后的内容（不包含标记本身）
+	  return input.substring(moreIndex + moreTag.length);
+};
+
 
 const removeFrontMatter = (input: string): string => {
 	const yamlFrontMatterRegex = /---[\s\S]+?---\n/;

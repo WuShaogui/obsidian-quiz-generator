@@ -1,6 +1,6 @@
 /* QuizModal, SelectorModal, NoteViewerModal, FolderViewerModal */
 .modal-qg {
-	width: 40%;
+	width: 60%;
 	height: 80%;
 }
 
@@ -127,6 +127,21 @@ FillInTheBlankQuestion, MatchingQuestion, ShortOrLongAnswerQuestion */
 .question-qg {
 	text-align: center;
 	font-size: var(--font-text-size);
+
+}
+
+.source-qg-no-border  {
+    text-align: left;
+    font-size: var(--font-text-size);
+	font-style: italic;
+}
+
+.source-qg-border {
+    text-align: left;
+    font-size: var(--font-text-size);
+	font-style: italic;
+	border: 0.125em solid;
+	margin-top: 15px; 
 }
 
 /* TrueFalseQuestion, MultipleChoiceQuestion, SelectAllThatApplyQuestion, MatchingQuestion */

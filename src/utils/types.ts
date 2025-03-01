@@ -7,23 +7,27 @@ export interface Quiz {
 export interface TrueFalse {
 	question: string;
 	answer: boolean;
+	source: string;
 }
 
 export interface MultipleChoice {
 	question: string;
 	options: string[];
 	answer: number;
+	source: string;
 }
 
 export interface SelectAllThatApply {
 	question: string;
 	options: string[];
 	answer: number[];
+	source: string;
 }
 
 export interface FillInTheBlank {
 	question: string;
 	answer: string[];
+	source: string;
 }
 
 export interface Matching {
@@ -32,9 +36,11 @@ export interface Matching {
 		leftOption: string;
 		rightOption: string;
 	}[];
+	source: string;
 }
 
 export interface ShortOrLongAnswer {
 	question: string;
 	answer: string;
+	source: string;
 }

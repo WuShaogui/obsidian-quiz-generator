@@ -8,7 +8,8 @@ export const getOllamaTextGenModels = async (baseUrl: string): Promise<Record<st
 
 export const getOllamaEmbeddingModels = async (baseUrl: string): Promise<Record<string, string>> => {
 	const models = await getOllamaModels(baseUrl);
-	return Object.fromEntries(Object.entries(models).filter(([model]) => model.includes("embed")));
+	// return Object.fromEntries(Object.entries(models).filter(([model]) => model.includes("embed")));
+	return Object.fromEntries(Object.entries(models).filter(([model]) => true));
 };
 
 const getOllamaModels = async (baseUrl: string): Promise<Record<string, string>> => {

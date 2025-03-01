@@ -1,4 +1,4 @@
-import { App } from "obsidian";
+import { App,Notice } from "obsidian";
 import { useState } from "react";
 import { QuizSettings } from "../../settings/config";
 import { Question } from "../../utils/types";
@@ -73,6 +73,7 @@ const QuizModal = ({ app, settings, quiz, quizSaver, reviewing, handleClose }: Q
 		} else if (isShortOrLongAnswer(question)) {
 			return <ShortOrLongAnswerQuestion key={questionIndex} app={app} question={question} settings={settings} />;
 		}
+
 	};
 
 	return (

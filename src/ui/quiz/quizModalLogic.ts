@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile,Notice } from "obsidian";
 import { createRoot, Root } from "react-dom/client";
 import { QuizSettings } from "../../settings/config";
 import { Question } from "../../utils/types";
@@ -46,6 +46,8 @@ export default class QuizModalLogic {
 			reviewing: this.quizSources.length === 0,
 			handleClose: () => this.removeQuiz(),
 		}));
+		// Notice(quiz);
+
 		document.body.addEventListener("keydown", this.handleEscapePressed);
 	}
 

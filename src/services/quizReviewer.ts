@@ -83,8 +83,10 @@ export default class QuizReviewer {
 	}
 
 	private spacedRepetitionParser(fileContents: string): void {
-		const inlineSeparator = this.escapeSpecialCharacters(this.settings.inlineSeparator);
-		const multilineSeparator = this.escapeSpecialCharacters(this.settings.multilineSeparator);
+		// const inlineSeparator = this.escapeSpecialCharacters(this.settings.inlineSeparator);
+		// const multilineSeparator = this.escapeSpecialCharacters(this.settings.multilineSeparator);
+		const inlineSeparator = this.escapeSpecialCharacters("?");
+		const multilineSeparator = this.escapeSpecialCharacters("?");
 
 		const choices = this.generateSpacedRepetitionChoicesRegex();
 		const choicesAnswer = this.generateSpacedRepetitionChoicesAnswerRegex();
@@ -98,7 +100,7 @@ export default class QuizReviewer {
 			"gi"
 		);
 		this.matchMultipleChoiceSelectAllThatApply(fileContents, multipleChoiceRegex);
-
+		
 		const matching = /[*_]{0,3}matching:[*_]{0,3}\s*(.+)\s*/;
 		const groupHeader = /.+\s*/;
 		const groupAChoices = choices.source.substring(0, choices.source.length / 2);
@@ -226,6 +228,7 @@ export default class QuizReviewer {
 			} as Matching);
 		}
 	}
+
 
 	private matchTrueFalseFillInTheBlankShortOrLongAnswer(fileContents: string, pattern: RegExp): void {
 		const matches = fileContents.matchAll(pattern);

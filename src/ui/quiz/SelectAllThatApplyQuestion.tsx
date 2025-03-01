@@ -12,23 +12,34 @@ const SelectAllThatApplyQuestion = ({ app, question }: SelectAllThatApplyQuestio
 	const [submitted, setSubmitted] = useState<boolean>(false);
 	const questionRef = useRef<HTMLDivElement>(null);
 	const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+	const [showSource, setShowSource] = useState(false);
+	const sourceRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		const component = new Component();
 
-		question.question.split("\\n").forEach(questionFragment => {
-			if (questionRef.current) {
-				MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
-			}
-		});
+		if(!submitted)
+		{
+			question.question.split("\\n").forEach(questionFragment => {
+				if (questionRef.current) {
+					MarkdownRenderer.render(app, questionFragment, questionRef.current, "", component);
+				}
+			});	
+		}
 
 		buttonRefs.current = buttonRefs.current.slice(0, question.options.length);
 		buttonRefs.current.forEach((button, index) => {
-			if (button) {
+			if (button && !submitted) {
 				MarkdownRenderer.render(app, question.options[index], button, "", component);
 			}
 		});
-	}, [app, question]);
+
+		// 显示答案
+		if (showSource && sourceRef.current) {
+			const formattedSource = question.source.replace(/\\n/g, '\n');
+			MarkdownRenderer.render(app, formattedSource, sourceRef.current, "", component);
+		}
+	}, [app, question,showSource]);
 
 	const toggleSelection = (buttonAnswer: number) => {
 		setUserAnswer(prevUserAnswer => {
@@ -53,6 +64,15 @@ const SelectAllThatApplyQuestion = ({ app, question }: SelectAllThatApplyQuestio
 		return "select-all-that-apply-button-qg";
 	};
 
+	const getClass = () => {
+		if(submitted){
+			return "source-qg-border"; 
+		}
+		else{
+			return "source-qg-no-border";
+		}
+	};
+
 	return (
 		<div className="question-container-qg">
 			<div className="question-qg" ref={questionRef} />
@@ -69,11 +89,15 @@ const SelectAllThatApplyQuestion = ({ app, question }: SelectAllThatApplyQuestio
 			</div>
 			<button
 				className="submit-answer-qg"
-				onClick={() => setSubmitted(true)}
+				onClick={() => {
+					setSubmitted(true);
+					setShowSource(true);
+				}}
 				disabled={!userAnswer.length || submitted}
 			>
 				Submit
 			</button>
+			<div className={getClass()} ref={sourceRef} />
 		</div>
 	);
 };

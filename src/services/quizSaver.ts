@@ -145,22 +145,26 @@ export default class QuizSaver {
 	private createSpacedRepetitionQuestion(question: Question): string {
 		if (isTrueFalse(question)) {
 			const answer = question.answer.toString().charAt(0).toUpperCase() + question.answer.toString().slice(1);
-			return `**True or False:** ${question.question} ${this.settings.inlineSeparator} ${answer}\n\n`;
+			// return `**True or False:** ${question.question} ${this.settings.inlineSeparator} ${answer}\n\n`;
+			return `**True or False:** ${question.question} \n?\n ${answer} \n ${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')} \n\n`;
 		} else if (isMultipleChoice(question)) {
 			const options = this.getSpacedRepetitionOptions(question.options);
 			return `**Multiple Choice:** ${question.question}\n` +
 				`${options.join("\n")}\n` +
 				`${this.settings.multilineSeparator}\n` +
-				`${options[question.answer]}\n\n`;
+				`${options[question.answer]}\n`+
+				`${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')}\n\n`;
 		} else if (isSelectAllThatApply(question)) {
 			const options = this.getSpacedRepetitionOptions(question.options);
 			const answers = options.filter((_, index) => question.answer.includes(index));
 			return `**Select All That Apply:** ${question.question}\n` +
 				`${options.join("\n")}\n` +
 				`${this.settings.multilineSeparator}\n` +
-				`${answers.join("\n")}\n\n`;
+				`${answers.join("\n")}\n`+
+				`${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')}\n\n`;
 		} else if (isFillInTheBlank(question)) {
-			return `**Fill in the Blank:** ${question.question} ${this.settings.inlineSeparator} ${question.answer.join(", ")}\n\n`;
+			// return `**Fill in the Blank:** ${question.question} ${this.settings.inlineSeparator} ${question.answer.join(", ")}\n\n`;
+			return `**Fill in the Blank:** ${question.question} \n?\n ${question.answer.join("\n").trim()} \n ${question.source.replace(/\\n/g, '\n-\n').replace(/\n\s*\n/g, '\n')}\n\n`;
 		} else if (isMatching(question)) {
 			const leftOptions = shuffleArray(question.answer.map(pair => pair.leftOption));
 			const rightOptions = shuffleArray(question.answer.map(pair => pair.rightOption));
@@ -171,12 +175,15 @@ export default class QuizSaver {
 				`Group B\n` +
 				`${this.getSpacedRepetitionOptions(rightOptions, 13).join("\n")}\n` +
 				`${this.settings.multilineSeparator}\n` +
-				`${answers.join("\n")}\n\n`;
+				`${answers.join("\n")}\n`+
+				`${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')}\n\n`;
 		} else if (isShortOrLongAnswer(question)) {
 			if (question.answer.length < 250) {
-				return `**Short Answer:** ${question.question} ${this.settings.inlineSeparator} ${question.answer}\n\n`;
+				// return `**Short Answer:** ${question.question} ${this.settings.inlineSeparator} ${question.answer}\n\n`;
+				return `**Short Answer:** ${question.question} \n?\n ${question.answer} \n ${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')}\n\n`;
 			}
-			return `**Long Answer:** ${question.question} ${this.settings.inlineSeparator} ${question.answer}\n\n`;
+			// return `**Long Answer:** ${question.question} ${this.settings.inlineSeparator} ${question.answer}\n\n`;
+			return `**Long Answer:** ${question.question} \n?\n ${question.answer} \n ${question.source.replace(/\\n/g, '\n').replace(/\n\s*\n/g, '\n-\n')}\n\n`;
 		} else {
 			return "Error saving question\n\n";
 		}
